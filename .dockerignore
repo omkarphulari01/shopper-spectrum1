@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.git/
+.github/
+.pytest_cache/
+.ruff_cache/
+notebooks/
+tests/
+reports/figures/*.png
+data/processed/*.parquet
+.venv/

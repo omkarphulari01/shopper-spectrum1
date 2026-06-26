@@ -1,0 +1,14 @@
+{
+  "rows_clean": 392688,
+  "customers": 4338,
+  "products_in_recommender": 3152,
+  "final_algorithm": "kmeans",
+  "k": 4,
+  "segments": {
+    "Regular": 1452,
+    "Occasional": 1377,
+    "At-Risk": 938,
+    "High-Value": 571
+  },
+  "recommender_hit_rate": 0.014
+}

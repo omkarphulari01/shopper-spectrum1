@@ -2,22 +2,32 @@
 __pycache__/
 *.py[cod]
 *.egg-info/
+build/
+dist/
+.eggs/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 .ipynb_checkpoints/
+
+# Virtual envs
 .venv/
 venv/
 env/
 
-# OS / editor
+# OS / editors
 .DS_Store
 .vscode/
 .idea/
 
-# Jupyter
-*.ipynb_checkpoints
-
 # Streamlit
 .streamlit/secrets.toml
 
-# Large data — see data/README.md for the download link.
-# Comment the next line out if you want to commit the dataset directly.
-data/online_retail.csv
+# Large raw data — keep the repo light (see data/README.md).
+# Comment out to commit the dataset directly.
+data/raw/*.csv
+
+# Generated artifacts (reproducible via `make train`).
+# Comment these out if you want them committed for deployment.
+data/processed/*.parquet

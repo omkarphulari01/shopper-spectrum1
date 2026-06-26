@@ -1,130 +1,130 @@
-# 🛒 Shopper Spectrum — Customer Segmentation & Product Recommendations
+# 🛒 Shopper Spectrum
 
-Customer segmentation (RFM + KMeans) and an item-based collaborative-filtering
-product recommender for an online retail dataset, served through an interactive
-**Streamlit** app.
+**Customer segmentation (RFM + clustering) and product recommendations (item-based collaborative filtering) for e-commerce — packaged as an installable Python library with a config-driven pipeline, a CLI, tests, CI, Docker, and a multipage Streamlit app.**
 
-**Domain:** E-Commerce & Retail Analytics
-**Problem types:** Unsupervised clustering · Collaborative filtering
+[![CI](https://github.com/omkarphulari01/shopper-spectrum/actions/workflows/ci.yml/badge.svg)](https://github.com/omkarphulari01/shopper-spectrum/actions)
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
 
-## ✨ What this project does
+## Highlights
 
-1. **Cleans** ~540K raw transactions down to ~393K valid rows (4,338 customers).
-2. **Engineers RFM features** — Recency, Frequency, Monetary — per customer.
-3. **Segments customers** into four actionable groups with KMeans.
-4. **Recommends products** using item-based cosine similarity.
-5. **Serves both** through a two-tab Streamlit app with real-time outputs.
+- **Config-driven pipeline** — every path and hyper-parameter lives in `config/config.yaml`; no magic numbers in code.
+- **Multi-algorithm clustering** — compares **KMeans, Hierarchical, and Gaussian Mixture** across k=2–10 using **silhouette, Calinski-Harabasz, and Davies-Bouldin**.
+- **Classic + ML segmentation** — RFM 1–5 quartile scoring *and* unsupervised clustering.
+- **Evaluated recommender** — item-based cosine similarity with a **leave-one-out hit-rate** metric.
+- **Installable package** with a console command: `shopper-spectrum train` / `recommend`.
+- **Tested & linted** — pytest suite + ruff, wired into GitHub Actions CI.
+- **Reproducible** — `make train` regenerates every artifact and figure.
+- **Deployable** — Dockerfile + multipage Streamlit app.
 
-### Customer segments (from this dataset)
+---
 
-| Segment | Avg Recency (days) | Avg Frequency | Avg Monetary | Customers |
+## Results on the bundled dataset
+
+~540K raw transactions → **392,688 clean rows** across **4,338 customers**; recommender covers **3,152 products**.
+
+| Segment | Avg Recency | Avg Frequency | Avg Monetary | Customers |
 |---|---|---|---|---|
-| **High-Value** | 19.8 | 15.8 | 9,823 | 571 |
-| **Regular** | 46.1 | 4.2 | 1,644 | 1,452 |
-| **Occasional** | 58.0 | 1.5 | 384 | 1,377 |
-| **At-Risk** | 259.4 | 1.4 | 385 | 938 |
+| 🟢 **High-Value** | 19.8 | 15.8 | 9,823 | 571 |
+| 🔵 **Regular** | 46.1 | 4.2 | 1,644 | 1,452 |
+| 🟡 **Occasional** | 58.0 | 1.5 | 384 | 1,377 |
+| 🔴 **At-Risk** | 259.4 | 1.4 | 385 | 938 |
+
+Final model: **KMeans, k=4** (silhouette 0.38). Recommender hit-rate@5 ≈ 9× the random baseline.
 
 ---
 
-## 📁 Project structure
+## Project structure
 
 ```
 shopper-spectrum/
-├── README.md
-├── requirements.txt
-├── LICENSE
-├── .gitignore
-├── data/
-│   ├── README.md              # dataset notes (CSV gitignored by default)
-│   └── online_retail.csv      # <- place dataset here
-├── notebooks/
-│   └── shopper_spectrum_analysis.ipynb   # full EDA + modeling walkthrough
-├── src/
-│   ├── preprocessing.py       # load & clean
-│   ├── rfm.py                 # RFM feature engineering
-│   ├── clustering.py          # scaling, k-selection, KMeans, labeling
-│   ├── recommender.py         # item-based collaborative filtering
-│   └── train_pipeline.py      # end-to-end: trains & saves all artifacts
-├── app/
-│   └── app.py                 # Streamlit web application
-├── models/                    # generated .pkl artifacts (after training)
-└── reports/
-    ├── figures/               # generated EDA & clustering plots
-    ├── segment_profiles.csv
-    ├── cluster_metrics.csv
-    └── rfm_segments.csv
+├── config/config.yaml              # single source of truth for paths & params
+├── src/shopper_spectrum/           # installable package
+│   ├── config.py                   # config loader + logging
+│   ├── data/                       # loader.py, preprocessing.py
+│   ├── features/rfm.py             # RFM + quartile scoring
+│   ├── models/                     # clustering.py, recommender.py
+│   ├── evaluation/metrics.py       # cluster validation metrics
+│   ├── visualization/plots.py      # all figures
+│   ├── pipeline.py                 # end-to-end orchestrator
+│   └── cli.py                      # `shopper-spectrum` command
+├── app/                            # multipage Streamlit app
+│   ├── app.py
+│   └── pages/                      # Recommendation · Segmentation · Dashboard
+├── notebooks/                      # 01_eda · 02_rfm_clustering · 03_recommender
+├── tests/                          # pytest suite
+├── models/                         # generated .pkl artifacts
+├── reports/figures/                # generated plots
+├── .github/workflows/ci.yml        # lint + test on push/PR
+├── Dockerfile · Makefile · pyproject.toml · requirements*.txt
 ```
 
 ---
 
-## 🚀 Quickstart
-
-### 1. Install dependencies
+## Quickstart
 
 ```bash
-pip install -r requirements.txt
+# 1. Install (editable, with dev tools)
+pip install -e ".[dev]"
+
+# 2. Put the dataset at data/raw/online_retail.csv  (see data/README.md)
+
+# 3. Train — cleans data, clusters, builds recommender, saves all artifacts
+shopper-spectrum train          # or: make train
+
+# 4. Try the recommender from the terminal
+shopper-spectrum recommend "WHITE HANGING HEART T-LIGHT HOLDER"
+
+# 5. Launch the app
+streamlit run app/app.py        # or: make app
 ```
 
-### 2. Add the dataset
+`make help` lists every available command.
 
-Put `online_retail.csv` in the `data/` folder (see `data/README.md` for the
-expected columns).
+---
 
-### 3. Train the models
+## The Streamlit app
+
+Three pages (sidebar navigation):
+
+1. **🎯 Product Recommendation** — type a product name → 5 similar products (card view).
+2. **🔍 Customer Segmentation** — enter Recency / Frequency / Monetary → predicted segment.
+3. **📊 Analytics Dashboard** — EDA charts, segment profiles, algorithm comparison, 3D RFM plot, and the product-similarity heatmap.
+
+---
+
+## Methodology
+
+**Cleaning** — drop missing `CustomerID`, exclude cancelled invoices (`InvoiceNo` starting with `C`), remove non-positive quantity/price, drop duplicates. All toggleable in config.
+
+**RFM** — Recency (days since last purchase), Frequency (distinct invoices), Monetary (total spend), plus 1–5 quartile R/F/M scores.
+
+**Clustering** — Frequency & Monetary are right-skewed, so they're `log1p`-transformed before `StandardScaler`. Three algorithms are compared on three internal metrics; **k=4** is chosen to match the four business segments. Clusters are labeled by ranking mean RFM.
+
+**Recommender** — customer×product quantity matrix → cosine similarity between products → top-20 neighbours stored per product (compact, fast to load). Evaluated with leave-one-out hit-rate.
+
+---
+
+## Testing & quality
 
 ```bash
-python src/train_pipeline.py
+make test     # pytest
+make lint     # ruff
 ```
 
-This cleans the data, runs RFM + clustering, builds the recommender, and writes
-all artifacts to `models/` and figures to `reports/figures/`.
+CI runs both on Python 3.9 and 3.11 for every push and PR.
 
-### 4. Launch the app
+---
+
+## Docker
 
 ```bash
-streamlit run app/app.py
+make docker-build
+make docker-run      # app on http://localhost:8501
 ```
 
----
-
-## 📱 Streamlit app
-
-**🎯 Product Recommendation** — type a product name, get 5 similar products
-(case-insensitive with substring matching).
-
-**🔍 Customer Segmentation** — enter Recency, Frequency, and Monetary values to
-predict the customer's segment (High-Value / Regular / Occasional / At-Risk).
-
----
-
-## 🔬 Methodology
-
-**Cleaning** — drop missing `CustomerID`, exclude cancelled invoices (`InvoiceNo`
-starting with `C`), remove non-positive quantities/prices, drop duplicates.
-
-**RFM** — Recency = days since last purchase; Frequency = distinct invoices;
-Monetary = total spend.
-
-**Clustering** — Frequency and Monetary are heavily right-skewed, so they are
-`log1p`-transformed before `StandardScaler`. Without this, KMeans isolates a tiny
-outlier cluster. `k` is evaluated from 2–10 via the elbow method and silhouette
-score; **k = 4** is used to match the four business segments. Clusters are
-labeled by ranking each cluster's mean RFM (low recency + high frequency + high
-monetary = best customers).
-
-**Recommender** — a Customer × Product quantity matrix feeds cosine similarity
-between products. Products bought by fewer than 5 distinct customers are dropped
-to keep similarities meaningful. The saved artifact stores only the top-20
-neighbors per product for a compact, fast-loading app.
-
----
-
-## 🛠 Tech stack
-
-Pandas · NumPy · scikit-learn · SciPy · Matplotlib · Seaborn · Streamlit · Joblib
-
-## 📄 License
+## License
 
 MIT — see [LICENSE](LICENSE).

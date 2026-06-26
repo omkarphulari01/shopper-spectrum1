@@ -1,0 +1,47 @@
+# ---------------------------------------------------------------------------
+# Shopper Spectrum — central configuration
+# Every path and hyper-parameter the pipeline uses lives here, so behaviour
+# can be changed without touching code.
+# ---------------------------------------------------------------------------
+
+project_name: shopper-spectrum
+random_state: 42
+
+paths:
+  raw_data: data/raw/online_retail.csv
+  processed_data: data/processed/transactions.parquet
+  rfm_data: data/processed/rfm.parquet
+  models_dir: models
+  figures_dir: reports/figures
+  reports_dir: reports
+
+preprocessing:
+  drop_missing_customer: true
+  exclude_cancelled: true          # InvoiceNo starting with 'C'
+  cancel_prefix: "C"
+  min_quantity: 1                  # keep Quantity >= this
+  min_unit_price: 0.01             # keep UnitPrice >= this
+  drop_duplicates: true
+
+rfm:
+  # reference_date is computed as max(InvoiceDate) + 1 day when null
+  reference_date: null
+  log_transform: [Frequency, Monetary]   # skewed columns to log1p before scaling
+
+clustering:
+  algorithms: [kmeans, hierarchical, gmm]   # compared during selection
+  k_min: 2
+  k_max: 10
+  chosen_k: 4                       # four business segments
+  final_algorithm: kmeans
+  segment_labels: [High-Value, Regular, Occasional, At-Risk]
+
+recommender:
+  min_customers_per_product: 5      # drop rarely-bought products
+  top_n_neighbors: 20               # stored per product
+  top_n_recommend: 5                # returned to the user
+  evaluation_sample: 500            # customers sampled for hit-rate eval
+
+app:
+  title: "Shopper Spectrum"
+  page_icon: "🛒"

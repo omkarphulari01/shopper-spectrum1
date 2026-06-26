@@ -1,23 +1,23 @@
 # Data
 
-Place the dataset here as `online_retail.csv`.
+```
+data/
+├── raw/         # place online_retail.csv here (input)
+└── processed/   # generated parquet files (output of `shopper-spectrum train`)
+```
 
-## Expected columns
+## Expected raw columns
 
 | Column | Description |
 |---|---|
-| InvoiceNo | Transaction number (invoices starting with `C` are cancellations) |
-| StockCode | Unique product/item code |
+| InvoiceNo | Transaction number (`C`-prefixed = cancellation) |
+| StockCode | Unique product code |
 | Description | Product name |
-| Quantity | Number of products purchased |
-| InvoiceDate | Date and time of the transaction |
-| UnitPrice | Price per product |
-| CustomerID | Unique customer identifier |
-| Country | Customer's country |
+| Quantity | Units purchased |
+| InvoiceDate | Transaction datetime |
+| UnitPrice | Price per unit |
+| CustomerID | Customer identifier |
+| Country | Customer country |
 
-## Note
-
-The raw CSV (~48 MB) is excluded from git by default via `.gitignore` to keep
-the repo light. If you want to commit it directly, remove the
-`data/online_retail.csv` line from `.gitignore`. Alternatively, host it with
-[Git LFS](https://git-lfs.com/) or link to the original download in this file.
+The raw CSV (~48 MB) is gitignored by default to keep the repo light. Remove the
+`data/raw/*.csv` line from `.gitignore` to commit it, or host it via Git LFS.
