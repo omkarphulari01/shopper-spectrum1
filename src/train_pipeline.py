@@ -90,6 +90,16 @@ def main():
     plt.ylabel("Count")
     savefig("transaction_value_dist.png")
 
+    # Monetary distribution per customer (log scale)
+    customer_value = df.groupby("CustomerID")["TotalPrice"].sum()
+    plt.figure(figsize=(9, 5))
+    plt.hist(customer_value.clip(upper=customer_value.quantile(0.99)), bins=50,
+             color="#CCB974")
+    plt.title("Monetary Distribution per Customer (99th pct capped)")
+    plt.xlabel("Total spend per customer")
+    plt.ylabel("Count")
+    savefig("customer_value_dist.png")
+
     # ---------------- RFM ----------------
     print("3/6  Building RFM table ...")
     rfm = build_rfm(df)
@@ -158,6 +168,26 @@ def main():
     sim_df, code2name, name2code = build_similarity(df, min_customers=5)
     print(f"     similarity matrix: {sim_df.shape}")
     neighbors = build_top_neighbors(sim_df, code2name, top_n=20)
+
+    # Product similarity heatmap for the top-N most popular products
+    top_codes = (
+        df.groupby("StockCode")["Quantity"].sum().sort_values(ascending=False)
+        .index
+    )
+    top_codes = [c for c in top_codes if c in sim_df.index][:20]
+    heat = sim_df.loc[top_codes, top_codes]
+    labels = [str(code2name.get(c, c))[:22] for c in top_codes]
+    plt.figure(figsize=(11, 9))
+    if sns_ok:
+        sns.heatmap(heat, xticklabels=labels, yticklabels=labels, cmap="viridis",
+                    square=True, cbar_kws={"label": "cosine similarity"})
+    else:
+        plt.imshow(heat.values, cmap="viridis", aspect="auto")
+        plt.colorbar(label="cosine similarity")
+        plt.xticks(range(len(labels)), labels, rotation=90)
+        plt.yticks(range(len(labels)), labels)
+    plt.title("Product Similarity Heatmap (top 20 products)")
+    savefig("similarity_heatmap.png")
 
     # ---------------- save artifacts ----------------
     joblib.dump(km, os.path.join(MODELS_DIR, "kmeans_model.pkl"))
