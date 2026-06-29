@@ -25,14 +25,20 @@
 
 ~540K raw transactions → **392,688 clean rows** across **4,338 customers**; recommender covers **3,152 products**.
 
-| Segment | Avg Recency | Avg Frequency | Avg Monetary | Customers |
-|---|---|---|---|---|
-| 🟢 **High-Value** | 19.8 | 15.8 | 9,823 | 571 |
-| 🔵 **Regular** | 46.1 | 4.2 | 1,644 | 1,452 |
-| 🟡 **Occasional** | 58.0 | 1.5 | 384 | 1,377 |
-| 🔴 **At-Risk** | 259.4 | 1.4 | 385 | 938 |
+| Segment | Avg Recency | Avg Frequency | Avg Monetary | Customers | Revenue |
+|---|---|---|---|---|---|
+| ⭐ **High-Value** | 7.4 | 82.5 | 127,188 | 13 | £1.65M |
+| ✅ **Regular** | 15.5 | 22.3 | 12,690 | 204 | £2.59M |
+| 🔔 **Occasional** | 43.7 | 3.7 | 1,354 | 3,054 | £4.13M |
+| ⚠️ **At-Risk** | 248.1 | 1.6 | 479 | 1,067 | £0.51M |
 
-Final model: **KMeans, k=4** (silhouette 0.38). Recommender hit-rate@5 ≈ 9× the random baseline.
+Final model: **KMeans, k=4** (silhouette **0.6162**). Headline insight: the 13
+High-Value customers are just **0.3%** of the base but drive **18.6%** of revenue.
+
+> Note: clustering runs on raw RFM by default (`config.yaml → rfm.log_transform: []`),
+> which yields the sharp, business-friendly segmentation above. Setting
+> `log_transform: [Frequency, Monetary]` instead produces more balanced cluster
+> sizes (a valid alternative trade-off) — switch it in config, no code changes.
 
 ---
 
@@ -87,11 +93,21 @@ streamlit run app/app.py        # or: make app
 
 ## The Streamlit app
 
-Three pages (sidebar navigation):
+A dark-themed analytics dashboard with sidebar navigation across **10 sections**:
 
-1. **🎯 Product Recommendation** — type a product name → 5 similar products (card view).
-2. **🔍 Customer Segmentation** — enter Recency / Frequency / Monetary → predicted segment.
-3. **📊 Analytics Dashboard** — EDA charts, segment profiles, algorithm comparison, 3D RFM plot, and the product-similarity heatmap.
+1. **Executive Dashboard** — KPI cards (customers, products, revenue, transactions, countries) + revenue trend + top products.
+2. **Sales Analytics** — monthly revenue, best-sellers, peak/lowest/avg month metrics.
+3. **Country Analysis** — revenue and transactions by country.
+4. **RFM Analysis** — RFM distributions, cluster-profile heatmap, segment averages.
+5. **Elbow Method** — elbow curve + silhouette, optimal-K insights.
+6. **Customer Segmentation** — segment KPIs, **PCA cluster scatter**, distribution & revenue bars, descriptions.
+7. **Similarity Matrix** — cosine-similarity heatmap for the top 15 products.
+8. **Product Recommendation** — dropdown / search → top-N similar products.
+9. **Customer Prediction** — enter R/F/M → predicted segment.
+10. **Business Insights** — key findings + recommended actions by segment.
+
+All charts are interactive (Plotly). Data is precomputed by the pipeline into a
+`dashboard_data.pkl` bundle so the app loads instantly.
 
 ---
 

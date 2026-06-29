@@ -26,7 +26,7 @@ preprocessing:
 rfm:
   # reference_date is computed as max(InvoiceDate) + 1 day when null
   reference_date: null
-  log_transform: [Frequency, Monetary]   # skewed columns to log1p before scaling
+  log_transform: []   # cluster on raw RFM (matches the reference dashboard, silhouette ~0.62)
 
 clustering:
   algorithms: [kmeans, hierarchical, gmm]   # compared during selection

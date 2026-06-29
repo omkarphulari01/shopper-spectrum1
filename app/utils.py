@@ -14,16 +14,22 @@ FIG_DIR = ROOT / "reports" / "figures"
 REPORTS_DIR = ROOT / "reports"
 
 SEGMENT_COLORS = {
-    "High-Value": "#2E7D32",
-    "Regular": "#1565C0",
-    "Occasional": "#F9A825",
-    "At-Risk": "#C62828",
+    "High-Value": "#22C55E",
+    "Regular": "#3B82F6",
+    "Occasional": "#F59E0B",
+    "At-Risk": "#EF4444",
+}
+SEGMENT_EMOJI = {
+    "High-Value": "⭐",
+    "Regular": "✅",
+    "Occasional": "🔔",
+    "At-Risk": "⚠️",
 }
 SEGMENT_BLURB = {
-    "High-Value": "Recent, frequent, big spenders. Reward and retain them.",
-    "Regular": "Steady purchasers — nurture toward high-value.",
-    "Occasional": "Rare, low-spend buyers — re-engage with offers.",
-    "At-Risk": "Haven't purchased in a long time — win-back campaigns.",
+    "High-Value": "Recent buyers, purchase often, spend the most. Strategy: VIP rewards, exclusive offers, loyalty programs.",
+    "Regular": "Consistent buyers with moderate spend. Strategy: Upsell, loyalty perks, cross-sell.",
+    "Occasional": "Buy rarely, low spend. Strategy: Re-engagement emails, seasonal promotions.",
+    "At-Risk": "Long time since last purchase. Strategy: Win-back campaigns, special discounts.",
 }
 
 
@@ -36,6 +42,7 @@ def load_artifacts():
         "labels": joblib.load(MODELS_DIR / "segment_labels.pkl"),
         "feature_config": joblib.load(MODELS_DIR / "feature_config.pkl"),
         "rec": joblib.load(MODELS_DIR / "recommender.pkl"),
+        "dashboard": joblib.load(MODELS_DIR / "dashboard_data.pkl"),
     }
 
 

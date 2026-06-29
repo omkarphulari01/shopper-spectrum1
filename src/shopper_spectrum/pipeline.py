@@ -18,6 +18,7 @@ from .data.loader import load_raw
 from .data.preprocessing import clean
 from .features.rfm import build_rfm
 from .models import clustering as clu
+from .models import dashboard as dash
 from .models import recommender as rec
 from .visualization import plots
 
@@ -87,6 +88,13 @@ def run(config_path: str | None = None) -> dict:
     hit_rate = rec.evaluate_hit_rate(
         matrix, neighbors, rc["evaluation_sample"], rc["top_n_recommend"],
         cfg["random_state"])
+
+    # Dashboard data bundle (KPIs, time series, PCA, heatmap, insights, etc.)
+    from sklearn.metrics import silhouette_score
+    sil = silhouette_score(X, labels)
+    dashboard_data = dash.build_dashboard_data(
+        df, rfm, X, metrics, sim_df, code2name, k, sil)
+    joblib.dump(dashboard_data, Path(models_dir) / "dashboard_data.pkl")
 
     # Save artifacts
     joblib.dump(model, Path(models_dir) / "cluster_model.pkl")

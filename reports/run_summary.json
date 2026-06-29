@@ -5,10 +5,10 @@
   "final_algorithm": "kmeans",
   "k": 4,
   "segments": {
-    "Regular": 1452,
-    "Occasional": 1377,
-    "At-Risk": 938,
-    "High-Value": 571
+    "Occasional": 3054,
+    "At-Risk": 1067,
+    "Regular": 204,
+    "High-Value": 13
   },
   "recommender_hit_rate": 0.014
 }
